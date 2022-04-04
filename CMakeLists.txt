@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
-project(allocator C)
+project(C_fixed_heap_allocator C)
 
-set(CC gcc-9.3)
+#set(CC gcc-9.3)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -20,5 +20,5 @@ endforeach()
 list(REMOVE_DUPLICATES includeDirs)
 
 # Mark executable
-add_executable(allocator ${sourceFiles})
-target_include_directories(allocator PRIVATE ${includeDirs})
+add_executable(C_fixed_heap_allocator ${sourceFiles})
+target_include_directories(C_fixed_heap_allocator PRIVATE ${includeDirs})
