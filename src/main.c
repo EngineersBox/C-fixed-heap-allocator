@@ -27,6 +27,14 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    test_struct->value = 42;
+    test_struct->str[0] = 'y';
+    test_struct->str[1] = 'a';
+    test_struct->str[2] = 'y';
+    test_struct->str[3] = '!';
+
+    printf("Test struct: [Value: %d] [Str: %s]", test_struct->value, test_struct->str);
+
     cfh_free(alloc, test_struct);
 
     if (cfh_destruct(alloc) == -1) {
