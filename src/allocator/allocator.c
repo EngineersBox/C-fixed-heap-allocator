@@ -1,25 +1,19 @@
 #include "allocator.h"
 #include <stddef.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 
 #include "../error/allocator_errno.h"
-
-#define NALLOC 1024
-
-static Header base;
-static Header *freep = NULL;
-
-void* __cfh_curbrk = 0;
 
 int cfh_new(Allocator* alloc) {
     if (alloc == NULL) {
         set_alloc_errno(NULL_ALLOCATOR_INSTANCE);
         return -1;
     }
-    alloc->heap_size = 0;
-    alloc->heap = NULL;
+    (*alloc).heap_size = 0;
+    (*alloc).freep = NULL;
+    (*alloc).current_brk = NULL;
+    (*alloc).heap = NULL;
     return 0;
 }
 
@@ -33,9 +27,9 @@ int cfh_init(Allocator* alloc,
         set_alloc_errno(HEAP_ALREADY_MAPPED);
         return -1;
     }
-    alloc->method = method;
-    alloc->heap_size = heap_size;
-    alloc->heap = mmap(
+    (*alloc).method = method;
+    (*alloc).heap_size = heap_size;
+    (*alloc).current_brk = (*alloc).heap = mmap(
         NULL,
         heap_size,
         PROT_READ | PROT_WRITE,
@@ -62,40 +56,39 @@ int cfh_destruct(Allocator* alloc) {
     return 0;
 }
 
-int cfh_brk(void* addr) {
-    void* newbrk;
-
-    if (newbrk < addr) {
+int cfh_brk(Allocator* alloc, void* addr) {
+    if (addr > (alloc->heap + (uintptr_t) alloc->heap_size)) {
         return -1;
     }
+    (*alloc).current_brk = addr;
     return 0;
 }
 
-void* cfh_sbrk(intptr_t increment) {
+void* cfh_sbrk(Allocator* alloc, intptr_t increment) {
     void* oldbrk;
-    if (__cfh_curbrk == NULL && cfh_brk(0) < 0) {
+    if (alloc->current_brk == NULL && cfh_brk(alloc, 0) < 0) {
         return (void*) -1;
     }
     if (increment == 0) {
-        return __cfh_curbrk;
+        return alloc->current_brk;
     }
-    oldbrk = __cfh_curbrk;
+    oldbrk = alloc->current_brk;
     if (increment > 0
         ? ((uintptr_t) oldbrk + (uintptr_t) increment < (uintptr_t) oldbrk)
         : ((uintptr_t) oldbrk < (uintptr_t) -increment)){
         return (void*) -1;
     }
-    if (cfh_brk(oldbrk + increment) < 0) {
+    if (cfh_brk(alloc, oldbrk + increment) < 0) {
         return (void*) -1;
     }
     return oldbrk;
 }
 
-void cfh_free(void* ap) {
+void cfh_free(Allocator* alloc, void* ap) {
     Header* bp, *p;
 
     bp = (Header*) ap - 1;
-    for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr) {
+    for (p = (*alloc).freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr) {
         if (p >= p->s.ptr && (bp > p || bp < p->s.ptr)) {
             break;
         }
@@ -112,33 +105,33 @@ void cfh_free(void* ap) {
     } else {
         p->s.ptr = bp;
     }
-    freep = p;
+    (*alloc).freep = p;
 }
 
-static Header* morecore(unsigned int nu) {
+Header* morecore(Allocator* alloc, unsigned int nu) {
     char* cp;
     Header* up;
 
     if (nu < NALLOC) {
         nu = NALLOC;
     }
-    cp = sbrk(nu * sizeof(Header));
+    cp = cfh_sbrk(alloc, nu * sizeof(Header));
     if (cp == (char*) - 1) {
         return NULL;
     }
     up = (Header*) cp;
     up->s.size = nu;
-    cfh_free((void*)(up + 1));
-    return freep;
+    cfh_free(alloc, (void*)(up + 1));
+    return alloc->freep;
 }
 
-void* cfh_malloc(unsigned nbytes) {
+void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
     Header *p, *prevp;
     unsigned nunits = (nbytes + sizeof(Header) + 1) / sizeof(Header) + 1;
 
-    if ((prevp = freep) == NULL) {
-        base.s.ptr = freep = prevp = &base;
-        base.s.size = 0;
+    if ((prevp = alloc->freep) == NULL) {
+        (*alloc).base.s.ptr = (*alloc).freep = prevp = &alloc->base;
+        (*alloc).base.s.size = 0;
     }
 
     for (p = prevp->s.ptr;; prevp = p, p = p->s.ptr) {
@@ -150,10 +143,11 @@ void* cfh_malloc(unsigned nbytes) {
                 p += p->s.size;
                 p->s.size = nunits;
             }
-            freep = prevp;
+            (*alloc).freep = prevp;
             return (void*) (p+1);
         }
-        if (p == freep && ((p = morecore(nunits)) == NULL)) {
+        if (p == alloc->freep && ((p = morecore(alloc, nunits)) == NULL)) {
+            set_alloc_errno(MALLOC_FAILED);
             return NULL;
         }
     }
