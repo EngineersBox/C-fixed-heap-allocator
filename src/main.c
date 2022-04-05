@@ -31,5 +31,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    cfh_free(alloc, test_struct);
+
     return 0;
 }

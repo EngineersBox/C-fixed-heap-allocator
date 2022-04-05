@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef _H_C_FIXED_HEAP_ALLOCATOR_ERRNO_
+#define _H_C_FIXED_HEAP_ALLOCATOR_ERRNO_
+
 #include <stdio.h>
 
 typedef enum allocator_error_num {
@@ -22,3 +27,5 @@ extern __thread char __alloc__errno_msg[MAX_ERR_STRING_LENGTH];
 #define set_alloc_errno(err) alloc_errno = err; sprintf(__alloc__errno_location, "%s(%s:%d)", __func__, __FILE__, __LINE__)
 
 __attribute__((__nothrow__)) void alloc_perror(char* prefix);
+
+#endif // _H_C_FIXED_HEAP_ALLOCATOR_ERRNO_

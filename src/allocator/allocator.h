@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
-#define H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
+#ifndef _H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
+#define _H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -40,8 +40,10 @@ int cfh_init(Allocator* alloc, AllocationMethod method, size_t heap_size);
 int cfh_destruct(Allocator* alloc);
 
 void* cfh_malloc(Allocator* alloc, unsigned nbytes);
+void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes);
 void cfh_free(Allocator* alloc, void* ap);
+
 void* cfh_sbrk(Allocator* alloc, intptr_t increment);
 int cfh_brk(Allocator* alloc, void* addr);
 
-#endif // H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
+#endif // _H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
