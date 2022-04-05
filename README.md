@@ -19,7 +19,8 @@ Managed memory is held as an anonymous memory map with custom `sbrk()` and `brk(
 
 ## Error Handling
 
-TODO
+Errors are handled in the same manner as standard usage of `perror(char* prefix)` follows, except with a custom method `alloc_perror(char* prefix)`.
+Any call made with the CFH methods, should follow with a return value check, in the case on an invalid/erroneous value, `alloc_perror(char* prefix)` should be called to display the error, file, line number and function name in stderr.
 
 ## Usage
 
