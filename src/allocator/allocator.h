@@ -36,15 +36,23 @@ typedef struct allocator {
 } Allocator;
 
 int cfh_new(Allocator* alloc);
-int cfh_init(Allocator* alloc, AllocationMethod method, size_t heap_size);
-int cfh_destruct(Allocator* alloc);
+int cfh_init(Allocator* alloc, AllocationMethod method, size_t heap_size)  __attribute__((nonnull));
+int cfh_destruct(Allocator* alloc)  __attribute__((nonnull));
 
-void* cfh_malloc(Allocator* alloc, unsigned nbytes);
-void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes);
-void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes);
 void cfh_free(Allocator* alloc, void* ap);
+__attribute__((malloc
+#if __GNUC__ >= 10
+    , malloc (cfh_free, 2)
+#endif
+)) void* cfh_malloc(Allocator* alloc, unsigned nbytes) __attribute__((nonnull));
+__attribute__((malloc
+#if __GNUC__ >= 10
+    , malloc (cfh_free, 1)
+#endif
+)) void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes) __attribute__((nonnull));
+void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes) __attribute__((nonnull(1)));
 
-void* cfh_sbrk(Allocator* alloc, intptr_t increment);
-int cfh_brk(Allocator* alloc, void* addr);
+void* cfh_sbrk(Allocator* alloc, intptr_t increment) __attribute__((nonnull(1)));
+int cfh_brk(Allocator* alloc, void* addr) __attribute__((nonnull(1)));
 
 #endif // _H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_

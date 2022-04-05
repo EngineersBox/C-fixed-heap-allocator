@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
 
     cfh_free(alloc, test_struct);
 
+
     if (cfh_destruct(alloc) == -1) {
         alloc_perror("");
         return 1;

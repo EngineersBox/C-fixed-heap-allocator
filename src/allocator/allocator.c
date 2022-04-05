@@ -33,7 +33,7 @@ int cfh_init(Allocator* alloc,
         NULL,
         heap_size,
         PROT_READ | PROT_WRITE,
-        MAP_SHARED | MAP_ANONYMOUS,
+        MAP_PRIVATE | MAP_ANONYMOUS,
         -1,
         0
     );
