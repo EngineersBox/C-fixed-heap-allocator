@@ -120,7 +120,7 @@ Header* morecore(Allocator* alloc, unsigned int nu) {
         return NULL;
     }
     up = (Header*) cp;
-    up->s.size = nu; // Bug: Cant access memory at up pointer for some reason
+    up->s.size = nu;
     cfh_free(alloc, (void*)(up + 1));
     return alloc->freep;
 }

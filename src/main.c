@@ -17,10 +17,6 @@ int main(int argc, char *argv[]) {
         alloc_perror("Initialisation failed for heap size 100000 bytes: ");
         return 1;
     }
-    if (cfh_destruct(alloc) == -1) {
-        alloc_perror("");
-        return 1;
-    }
 
     struct TestStruct* test_struct = cfh_malloc(alloc, sizeof(struct TestStruct));
     if (test_struct == NULL) {
@@ -32,6 +28,11 @@ int main(int argc, char *argv[]) {
     }
 
     cfh_free(alloc, test_struct);
+
+    if (cfh_destruct(alloc) == -1) {
+        alloc_perror("");
+        return 1;
+    }
 
     return 0;
 }
