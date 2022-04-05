@@ -41,6 +41,7 @@ int cfh_destruct(Allocator* alloc);
 
 void* cfh_malloc(Allocator* alloc, unsigned nbytes);
 void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes);
+void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes);
 void cfh_free(Allocator* alloc, void* ap);
 
 void* cfh_sbrk(Allocator* alloc, intptr_t increment);
