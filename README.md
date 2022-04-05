@@ -16,6 +16,10 @@ Managed memory is held as an anonymous memory map with custom `sbrk()` and `brk(
 | `void* cfh_sbrk(Allocator* alloc, intptr_t increment)`                      	| Increments the data space by increment bytes. Calling `sbrk()` with an increment of 0 can be used to find the current location of the program break. On success, `sbrk()` returns the previous program break. (If the break was increased, then this value is a pointer to the start of the newly allocated memory). On error, `(void*) -1` is returned. 	|
 | `void* cfh_brk(Allocator* alloc, void* addr)`                               	| Sets the end of the data segment to the value specified by `addr`, when that value is reasonable, the mapped region has enough memory, and the process does not exceed its maximum data size. On success, `brk()` returns `0`. On error, `-1` is returned.                                                                                               	|
 
+## Error Handling
+
+TODO
+
 ## Usage
 
 ```c
@@ -67,3 +71,8 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 ```
+
+## TODO
+
+* Implement `void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes)`
+* Refactor to change allocation method based on the one provided in `cfh_init(...)`
