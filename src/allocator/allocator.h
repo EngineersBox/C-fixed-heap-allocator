@@ -52,7 +52,7 @@ __attribute__((malloc
 )) void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes) __attribute__((nonnull));
 void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes) __attribute__((nonnull(1)));
 
-void* cfh_sbrk(Allocator* alloc, intptr_t increment) __attribute__((nonnull(1)));
+void* cfh_sbrk(Allocator* alloc, intptr_t increment) __attribute__((nonnull));
 int cfh_brk(Allocator* alloc, void* addr) __attribute__((nonnull(1)));
 
 #endif // _H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
