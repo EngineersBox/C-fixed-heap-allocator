@@ -108,7 +108,7 @@ void cfh_free(Allocator* alloc, void* ap) {
     (*alloc).freep = p;
 }
 
-Header* morecore(Allocator* alloc, unsigned int nu) {
+Header* more_core(Allocator* alloc, unsigned int nu) {
     char* cp;
     Header* up;
 
@@ -146,7 +146,7 @@ void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
             (*alloc).freep = prevp;
             return (void*) (p+1);
         }
-        if (p == alloc->freep && ((p = morecore(alloc, nunits)) == NULL)) {
+        if (p == alloc->freep && ((p = more_core(alloc, nunits)) == NULL)) {
             set_alloc_errno(MALLOC_FAILED);
             return NULL;
         }
