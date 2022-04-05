@@ -47,7 +47,7 @@ __attribute__((malloc
 )) void* cfh_malloc(Allocator* alloc, unsigned nbytes) __attribute__((nonnull));
 __attribute__((malloc
 #if __GNUC__ >= 10
-    , malloc (cfh_free, 1)
+    , malloc (cfh_free, 2)
 #endif
 )) void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes) __attribute__((nonnull));
 void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes) __attribute__((nonnull(1)));
