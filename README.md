@@ -54,6 +54,17 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    test_struct->value = 42;
+    test_struct->str[0] = 'y';
+    test_struct->str[1] = 'a';
+    test_struct->str[2] = 'y';
+    test_struct->str[3] = '!';
+
+    printf("Test struct:   [Value: %d] [Str: %s]\n", test_struct->value, test_struct->str);
+    // Prints: Test struct: [Value: 42] [Str: yay!]
+    
+    cfh_free(alloc, test_struct);
+
     struct TestStruct* test_struct2 = cfh_malloc(alloc, sizeof(struct TestStruct));
     if (test_struct2 == NULL) {
         char *msg = calloc(100, sizeof(char));
@@ -62,12 +73,6 @@ int main(int argc, char *argv[]) {
         free(msg);
         return 1;
     }
-    
-    test_struct->value = 42;
-    test_struct->str[0] = 'y';
-    test_struct->str[1] = 'a';
-    test_struct->str[2] = 'y';
-    test_struct->str[3] = '!';
 
     test_struct2->value = 84;
     test_struct2->str[0] = 'd';
@@ -75,16 +80,14 @@ int main(int argc, char *argv[]) {
     test_struct2->str[2] = 'n';
     test_struct2->str[3] = 'e';
 
-    printf("Test struct:   [Value: %d] [Str: %s]\n", test_struct->value, test_struct->str);
-    printf("Test struct 2: [Value: %d] [Str: %s]\n", test_struct2->value, test_struct2->str);
-    /* Prints:
-     * Test Struct:   [Value: 42] [Str: yay!]
-     * Test Struct 2: [Value: 84] [Str: done]
-     */
-
+    printf("Test Struct 2: [Value: %d] [Str: %s]\n", test_struct2->value, test_struct2->str);
+    // Prints: Test struct 2: [Value: 84] [Str: done]
+    
     cfh_free(alloc, test_struct2);
-    cfh_free(alloc, test_struct);
 
+    printf("Deallocated memory from Test Struct: %d", test_struct->value);
+    // Prints: Deallocated memory from Test Struct: 84
+    
     if (cfh_destruct(alloc) == -1) {
         alloc_perror("");
         return 1;
