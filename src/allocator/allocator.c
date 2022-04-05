@@ -15,19 +15,51 @@ void* __cfh_curbrk = 0;
 
 int cfh_new(Allocator* alloc) {
     alloc = malloc(sizeof(Allocator));
-    return alloc == NULL ? -1 : 0;
+    if (alloc == NULL) {
+        set_alloc_errno(FAILED_ALLOCATION);
+        return -1;
+    }
+    alloc->heap_size = 0;
+    alloc->heap = NULL;
+    printf("Heap ptr: %p\n", alloc->heap);
+    return 0;
 }
 
 int cfh_init(Allocator* alloc,
              AllocationMethod method,
              size_t heap_size) {
     if (alloc == NULL) {
+        set_alloc_errno(NULL_ALLOCATOR_INSTANCE);
         return -1;
     } else if (alloc->heap != NULL) {
+        set_alloc_errno(HEAP_ALREADY_MAPPED);
         return -1;
     }
     alloc->method = method;
+    alloc->heap = mmap(
+        NULL,
+        heap_size,
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS,
+        -1,
+        0
+    );
+    if (alloc->heap == NULL) {
+        set_alloc_errno(HEAP_MMAP_FAILED);
+        return -1;
+    }
+    return 0;
+}
 
+int cfh_destruct(Allocator* alloc) {
+    if (alloc == NULL) {
+        set_alloc_errno(BAD_DEALLOC);
+        return -1;
+    } else if (alloc->heap != NULL && munmap(alloc->heap, alloc->heap_size)) {
+        set_alloc_errno(HEAP_UNMAP_FAILED);
+        return -1;
+    }
+    free(alloc);
     return 0;
 }
 

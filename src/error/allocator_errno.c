@@ -7,11 +7,17 @@ __thread int alloc_errno = NONE;
 __thread char __alloc__errno_location[MAX_ERR_LINE_LENGTH];
 __thread char __alloc__errno_msg[MAX_ERR_STRING_LENGTH];
 
+#define enum_error(enum_val, err_msg) case enum_val: strcpy(__alloc__errno_msg, err_msg); break;
+
 void get_alloc_errmsg(AllocatorErrno err) {
     switch (err) {
-        case NULL_ALLOCATOR_INSTANCE: strcpy(__alloc__errno_msg, "Allocator is not initialised"); break;
-        case HEAP_ALREADY_MAPPED: strcpy(__alloc__errno_msg, "Managed heap has already been allocated"); break;
-        case NONE: strcpy(__alloc__errno_msg, ""); break;
+        enum_error(FAILED_ALLOCATION, "Unable to allocate memory for manager")
+        enum_error(NULL_ALLOCATOR_INSTANCE, "Allocator is not initialised")
+        enum_error(HEAP_ALREADY_MAPPED, "Managed heap has already been allocated")
+        enum_error(HEAP_MMAP_FAILED, "Failed to map memory for heap")
+        enum_error(HEAP_UNMAP_FAILED, "Failed to unmap anonymous memory for heap")
+        enum_error(BAD_DEALLOC, "Unable to destruct Allocator instance")
+        enum_error(NONE, "")
     }
 }
 
@@ -21,7 +27,7 @@ void alloc_perror(char* prefix) {
     get_alloc_errmsg(alloc_errno);
     fprintf(
         stderr,
-        "%s%s\n\tat %s",
+        "%s%s\n\tat %s\n",
         trunc_prefix,
         __alloc__errno_msg,
         __alloc__errno_location
