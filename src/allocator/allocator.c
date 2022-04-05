@@ -14,14 +14,12 @@ static Header *freep = NULL;
 void* __cfh_curbrk = 0;
 
 int cfh_new(Allocator* alloc) {
-    alloc = malloc(sizeof(Allocator));
     if (alloc == NULL) {
-        set_alloc_errno(FAILED_ALLOCATION);
+        set_alloc_errno(NULL_ALLOCATOR_INSTANCE);
         return -1;
     }
     alloc->heap_size = 0;
     alloc->heap = NULL;
-    printf("Heap ptr: %p\n", alloc->heap);
     return 0;
 }
 
@@ -36,6 +34,7 @@ int cfh_init(Allocator* alloc,
         return -1;
     }
     alloc->method = method;
+    alloc->heap_size = heap_size;
     alloc->heap = mmap(
         NULL,
         heap_size,

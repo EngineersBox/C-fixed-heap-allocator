@@ -30,8 +30,8 @@ typedef struct allocator {
     void* heap;
 } Allocator;
 
-int cfh_new(Allocator *alloc);
-int cfh_init(Allocator *alloc, AllocationMethod method, size_t heap_size);
+int cfh_new(Allocator* alloc);
+int cfh_init(Allocator* alloc, AllocationMethod method, size_t heap_size);
 int cfh_destruct(Allocator* alloc);
 
 void* cfh_malloc(unsigned nbytes);
