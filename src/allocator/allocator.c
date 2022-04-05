@@ -1,6 +1,10 @@
 #include "allocator.h"
 #include <stddef.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+
+#include "../error/allocator_errno.h"
 
 #define NALLOC 1024
 
@@ -9,22 +13,26 @@ static Header *freep = NULL;
 
 void* __cfh_curbrk = 0;
 
+int cfh_new(Allocator* alloc) {
+    alloc = malloc(sizeof(Allocator));
+    return alloc == NULL ? -1 : 0;
+}
+
+int cfh_init(Allocator* alloc,
+             AllocationMethod method,
+             size_t heap_size) {
+    if (alloc == NULL) {
+        return -1;
+    } else if (alloc->heap != NULL) {
+        return -1;
+    }
+    alloc->method = method;
+
+    return 0;
+}
+
 int cfh_brk(void* addr) {
     void* newbrk;
-    __cfh_curbrk = newbrk = (void*) ({
-        unsigned long int resultvar = ({
-            unsigned long int resultvar;
-            __typeof__ ((addr) - (addr)) __arg1 = ((__typeof__ ((addr) - (addr))) (addr));
-            register __typeof__ ((addr) - (addr)) _a1 asm ("rdi") = __arg1;
-            asm volatile ( "syscall\n\t" : "=a" (resultvar) : "0" (12), "r" (_a1) : "memory", "cc", "r11", "cx");
-            (long int) resultvar;
-        });
-        if (__builtin_expect ((((unsigned long int) (long int) (resultvar) >= -4095L)), 0)) {
-            (rtld_errno = ((-(resultvar))));
-            resultvar = (unsigned long int) -1;
-        }
-        (long int) resultvar;
-    }) (brk, 1, addr);
 
     if (newbrk < addr) {
         return -1;

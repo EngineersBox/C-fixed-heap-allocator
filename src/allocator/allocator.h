@@ -4,6 +4,7 @@
 #define H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef long Align;
 
@@ -15,9 +16,22 @@ typedef union header {
     Align x;
 } Header;
 
-typedef struct allocator {
+typedef enum allocation_method {
+    BEST_FIT,
+    FIRST_FIT,
+    WORST_FIT,
+    BUDDYS_SYSTEM,
+    NEXT_FIT,
+} AllocationMethod;
 
+typedef struct allocator {
+    AllocationMethod method;
+    size_t heap_size;
+    void* heap;
 } Allocator;
+
+int cfh_new(Allocator *alloc);
+int cfh_init(Allocator *alloc, AllocationMethod method, size_t heap_size);
 
 void* cfh_malloc(unsigned nbytes);
 void cfh_free(void* ap);
