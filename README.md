@@ -34,7 +34,7 @@ free itself after `main()` has finished.
 In order to use this method, you will need to include the `static_allocator.h` header in your main and supply a set of
 compilation definitions for configuration.
 
-This will make the `CFH_ALLOCATOR` static allocator available for you to access and allocator to.
+This will make the `CFH_ALLOCATOR` static allocator available for you to access and allocate to.
 
 ### Compilation Definitions
 
@@ -57,6 +57,11 @@ An example is as follows, compiled with the following options:
 ```c
 #include "allocator/static_allocator.h"
 #include "error/allocator_errno.h"
+
+struct TestStruct {
+    int value;
+    char str[4];
+};
 
 int main(int argc, char *argv[]) {
     struct TestStruct* test_struct = cfh_malloc(CFH_ALLOCATOR, sizeof(*test_struct));
