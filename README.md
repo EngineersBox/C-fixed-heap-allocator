@@ -70,23 +70,23 @@ This will make the `CFH_ALLOCATOR` static allocator available for you to access 
 
 ### Compilation Definitions
 
-| Definition                                	| Required 	| Default  	| Description                                                                                                                                                                       	|
-|-------------------------------------------	|----------	|----------	|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
-| `-DSTATIC_CFH`                            	| `true`   	| `false`  	| Enable the static allocator                                                                                                                                                       	|
-| `-DSTATIC_CFH_HEAP_SIZE=<bytes>`          	| `false`  	| `100000` 	| Configure the byte size of the heap for the allocator                                                                                                                             	|
-| `-DSTATIC_CFH_CONSTRUCTOR_PRIORITY=<int>` 	| `false`  	| `0`      	| Set the priority of the constructor method for initialising the allocator, this is for compatibility with other constructors using `__attribute__((__constructor__(<priority>)))` 	|
-| `-DSTATIC_CFH_DESTRUCTOR_PRIORITY=<int>`  	| `false`  	| `0`      	| Set the priority of the destructor method for initialising the allocator, this is for compatibility with other destructors using `__attribute__((__destructor__(<priority>)))`    	|
+| Definition                                	| Required 	| Default  	     | Description                                                                                                                                                                       	|
+|-------------------------------------------	|----------	|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|
+| `-DSTATIC_CFH`                            	| `true`   	| `false`  	     | Enable the static allocator                                                                                                                                                       	|
+| `-DSTATIC_CFH_HEAP_SIZE=<bytes>`          	| `false`  	| `100000` 	     | Configure the byte size of the heap for the allocator                                                                                                                             	|
+| `-DSTATIC_CFH_CONSTRUCTOR_PRIORITY=<int>` 	| `false`  	| `Not set`    	 | Set the priority of the constructor method for initialising the allocator, this is for compatibility with other constructors using `__attribute__((__constructor__(<priority>)))` 	|
+| `-DSTATIC_CFH_DESTRUCTOR_PRIORITY=<int>`  	| `false`  	| `Not set`    	 | Set the priority of the destructor method for initialising the allocator, this is for compatibility with other destructors using `__attribute__((__destructor__(<priority>)))`    	|
 
 An example is as follows, compiled with the following options:
 
 ```shell
 -DSTATIC_CFH
 -DSTATIC_CFH_HEAP_SIZE=200000
--DSTATIC_CFH_CONSTRUCTOR_PRIORITY=0
--DSTATIC_CFH_DESTRUCTOR_PRIORITY=0
+-DSTATIC_CFH_DESTRUCTOR_PRIORITY=2
 ```
 
 ```c
+#include <stdlib.h>
 #include "allocator/static_allocator.h"
 #include "error/allocator_errno.h"
 
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
 
     printf("Test struct:   [Value: %d] [Str: %s]\n", test_struct->value, test_struct->str);
     // Prints: Test struct: [Value: 42] [Str: yay!]
-    
+
     cfh_free(CFH_ALLOCATOR, test_struct);
 
     struct TestStruct* test_struct2 = cfh_malloc(CFH_ALLOCATOR, sizeof(*test_struct2));
@@ -133,15 +133,14 @@ int main(int argc, char *argv[]) {
 
     printf("Test Struct 2: [Value: %d] [Str: %s]\n", test_struct2->value, test_struct2->str);
     // Prints: Test struct 2: [Value: 84] [Str: done]
-    
+
     cfh_free(CFH_ALLOCATOR, test_struct2);
 
     printf("Deallocated memory from Test Struct: %d", test_struct->value);
     // Prints: Deallocated memory from Test Struct: 84
-    
+
     return 0;
 }
-
 ```
 
 ## Dynamic
