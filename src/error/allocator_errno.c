@@ -15,6 +15,10 @@ inline void get_alloc_errmsg(AllocatorErrno err) {
         enum_error(HEAP_UNMAP_FAILED, "Failed to unmap anonymous memory for heap")
         enum_error(BAD_DEALLOC, "Unable to destruct Allocator instance")
         enum_error(MALLOC_FAILED, "Unable to reserve memory")
+        enum_error(MUTEX_LOCK_INIT, "Creation of mutex lock failed")
+        enum_error(MUTEX_LOCK_LOCK, "Unable to lock allocator mutex")
+        enum_error(MUTEX_LOCK_UNLOCK, "Unable to unlock allocator mutex")
+        enum_error(MUTEX_LOCK_DESTROY, "Failed to destroy mutex lock")
         enum_error(NONE, "")
     }
 }

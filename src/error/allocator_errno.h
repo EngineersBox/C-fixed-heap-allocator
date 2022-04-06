@@ -14,6 +14,10 @@ typedef enum allocator_error_num {
     HEAP_UNMAP_FAILED,
     BAD_DEALLOC,
     MALLOC_FAILED,
+    MUTEX_LOCK_INIT,
+    MUTEX_LOCK_LOCK,
+    MUTEX_LOCK_UNLOCK,
+    MUTEX_LOCK_DESTROY,
 } AllocatorErrno;
 
 
@@ -28,6 +32,7 @@ extern __thread char __alloc__errno_msg[MAX_ERR_STRING_LENGTH];
 extern inline void get_alloc_errmsg(AllocatorErrno err);
 
 #define set_alloc_errno(err) alloc_errno = err; sprintf(__alloc__errno_location, "%s(%s:%d)", __func__, __FILE__, __LINE__)
+#define set_alloc_errno_msg(err, msg) alloc_errno = err; sprintf(__alloc__errno_location, "%s %s(%s:%d)", msg, __func__, __FILE__, __LINE__)
 
 #define alloc_perror(prefix) { \
     char trunc_prefix[MAX_PREFIX_LENGTH]; \

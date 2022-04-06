@@ -5,9 +5,32 @@
 
 #include "../error/allocator_errno.h"
 
+#define __cfh_lock_lock_handled(lock) ({ \
+    int lock_result = 0; \
+    if (__cfh_lock_lock(lock) == EINVAL) { \
+        set_alloc_errno_msg(MUTEX_LOCK_LOCK, strerror(EINVAL)); \
+        lock_result = -1; \
+    } \
+    lock_result; \
+})
+
+#define __cfh_lock_unlock_handled(lock) ({ \
+    int unlock_result = 0; \
+    if ((unlock_result = __cfh_lock_unlock(lock)) != 0) { \
+        set_alloc_errno_msg(MUTEX_LOCK_UNLOCK, strerror(unlock_result)); \
+        unlock_result = -1; \
+    } \
+    unlock_result; \
+})
+
 int cfh_new(Allocator* alloc) {
     if (alloc == NULL) {
         set_alloc_errno(NULL_ALLOCATOR_INSTANCE);
+        return -1;
+    }
+    int lock_init_result;
+    if ((lock_init_result = __cfh_lock_init(&alloc->mutex, PTHREAD_MUTEX_ERRORCHECK)) != 0) {
+        set_alloc_errno_msg(MUTEX_LOCK_INIT, strerror(lock_init_result));
         return -1;
     }
     alloc->heap_size = 0;
@@ -23,8 +46,13 @@ int cfh_init(Allocator* alloc,
     if (alloc == NULL) {
         set_alloc_errno(NULL_ALLOCATOR_INSTANCE);
         return -1;
-    } else if (alloc->heap != NULL) {
+    }
+    if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
+        return -1;
+    }
+    if (alloc->heap != NULL) {
         set_alloc_errno(HEAP_ALREADY_MAPPED);
+        __cfh_lock_unlock_handled(&alloc->mutex);
         return -1;
     }
     alloc->method = method;
@@ -39,17 +67,26 @@ int cfh_init(Allocator* alloc,
     );
     if (alloc->heap == NULL) {
         set_alloc_errno(HEAP_MMAP_FAILED);
+        __cfh_lock_unlock_handled(&alloc->mutex);
         return -1;
     }
-    return 0;
+    return __cfh_lock_unlock_handled(&alloc->mutex);
 }
 
 int cfh_destruct(Allocator* alloc) {
     if (alloc == NULL) {
         set_alloc_errno(BAD_DEALLOC);
         return -1;
-    } else if (alloc->heap != NULL && munmap(alloc->heap, alloc->heap_size)) {
+    }
+    if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
+        return -1;
+    }
+    if (alloc->heap != NULL && munmap(alloc->heap, alloc->heap_size)) {
         set_alloc_errno(HEAP_UNMAP_FAILED);
+        __cfh_lock_unlock_handled(&alloc->mutex);
+        return -1;
+    }
+    if (__cfh_lock_unlock_handled(&alloc->mutex) != 0) {
         return -1;
     }
     free(alloc);
@@ -126,6 +163,9 @@ Header* more_core(Allocator* alloc, unsigned int nu) {
 }
 
 void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
+    if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
+        return NULL;
+    }
     Header *p, *prevp;
     unsigned nunits = (nbytes + sizeof(Header) + 1) / sizeof(Header) + 1;
 
@@ -144,10 +184,11 @@ void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
                 p->s.size = nunits;
             }
             alloc->freep = prevp;
-            return (void*) (p+1);
+            return __cfh_lock_unlock_handled(&alloc->mutex) == 0 ? (void*) (p+1) : NULL;
         }
         if (p == alloc->freep && ((p = more_core(alloc, nunits)) == NULL)) {
             set_alloc_errno(MALLOC_FAILED);
+            __cfh_lock_unlock_handled(&alloc->mutex);
             return NULL;
         }
     }

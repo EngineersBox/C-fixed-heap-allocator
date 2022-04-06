@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "../thread/lock.h"
 
 typedef long Align;
 
@@ -28,10 +29,13 @@ typedef enum allocation_method {
 
 typedef struct allocator {
     AllocationMethod method;
-    size_t heap_size;
+    __cfh_lock_t mutex;
+
     Header base;
     Header* freep;
     void* current_brk;
+
+    size_t heap_size;
     void* heap;
 } Allocator;
 
