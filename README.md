@@ -22,6 +22,38 @@ Managed memory is held as an anonymous memory map with custom `sbrk()` and `brk(
 Errors are handled in the same manner as standard usage of `perror(char* prefix)` follows, except with a custom method `alloc_perror(char* prefix)`.
 Any call made with the CFH methods, should follow with a return value check, in the case on an invalid/erroneous value, `alloc_perror(char* prefix)` should be called to display the error, file, line number and function name in stderr.
 
+An example of an error being logged as a result of `alloc_perror("An error occured: ")` is as follows:
+
+```
+An error occured: Managed heap has already been allocated
+	at main(/Users/EngineersBox/Desktop/Projects/C:C++/C-fixed-heap-allocator/src/main.c:17)
+	at cfh_init(/Users/EngineersBox/Desktop/Projects/C:C++/C-fixed-heap-allocator/src/allocator/allocator.c:27)
+```
+
+These locations correspond the following:
+
+### Main.c:17
+
+```c
+// ... snip ...
+if (cfh_init(alloc, FIRST_FIT, 100000) == -1) {
+    alloc_perror("An error occured: ");
+    return 1;
+}
+// ... snip ...
+```
+
+### Allocator.c:27
+
+```c
+// ... snip ...
+} else if (alloc->heap != NULL) {
+    set_alloc_errno(HEAP_ALREADY_MAPPED);
+    return -1;
+}
+// ... snip ...
+```
+
 ## Usage
 
 There are two ways to utilise the allocator, one is through handled static construction and dynamic instantiation.
