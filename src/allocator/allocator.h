@@ -53,8 +53,12 @@ __attribute__((malloc
 #if __GNUC__ >= 10
     , malloc (cfh_free, 2)
 #endif
-)) void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes) __attribute__((nonnull));
-void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes) __attribute__((nonnull(1)));
+)) __attribute__((alloc_size(2,3))) void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes) __attribute__((nonnull));
+__attribute__((malloc
+#if __GNUC__ >= 10
+, malloc (cfh_free, 2)
+#endif
+)) __attribute__((alloc_size(3))) void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes) __attribute__((nonnull(1)));
 
 void* cfh_sbrk(Allocator* alloc, intptr_t increment) __attribute__((nonnull(1)));
 int cfh_brk(Allocator* alloc, void* addr) __attribute__((nonnull(1)));
