@@ -36,9 +36,6 @@ __attribute__((__constructor__(STATIC_CFH_CONSTRUCTOR_PRIORITY))) int __static_c
 }
 
 __attribute__((__destructor__(STATIC_CFH_DESTRUCTOR_PRIORITY))) int __static_cfh_destructor() {
-    if (CFH_ALLOCATOR == NULL) {
-        return 0;
-    }
     if (cfh_destruct(CFH_ALLOCATOR) == -1) {
         alloc_perror("");
         return 1;
