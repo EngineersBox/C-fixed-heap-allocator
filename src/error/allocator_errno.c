@@ -21,5 +21,6 @@ inline void get_alloc_errmsg(AllocatorErrno err) {
         enum_error(MUTEX_LOCK_UNLOCK, "Unable to unlock allocator mutex")
         enum_error(MUTEX_LOCK_DESTROY, "Failed to destroy mutex lock")
         enum_error(NONE, "")
+        default: break;
     }
 }
