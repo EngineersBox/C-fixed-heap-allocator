@@ -46,11 +46,9 @@ int cfh_init(Allocator* alloc,
     if (alloc == NULL) {
         set_alloc_errno(NULL_ALLOCATOR_INSTANCE);
         return -1;
-    }
-    if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
+    } else if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
         return -1;
-    }
-    if (alloc->heap != NULL) {
+    } else if (alloc->heap != NULL) {
         set_alloc_errno(HEAP_ALREADY_MAPPED);
         __cfh_lock_unlock_handled(&alloc->mutex);
         return -1;
