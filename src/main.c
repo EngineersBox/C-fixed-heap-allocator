@@ -8,7 +8,7 @@ struct TestStruct {
 };
 
 int main(int argc, char *argv[]) {
-    Allocator* alloc = malloc(sizeof(Allocator));
+    Allocator* alloc = malloc(sizeof(*alloc));
     if (cfh_new(alloc) == -1) {
         alloc_perror("");
         return 1;
@@ -18,9 +18,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    struct TestStruct* test_struct = cfh_malloc(alloc, sizeof(struct TestStruct));
+    struct TestStruct* test_struct = cfh_malloc(alloc, sizeof(*test_struct));
     if (test_struct == NULL) {
-        char *msg = calloc(100, sizeof(char));
+        char *msg = calloc(100, sizeof(*msg));
         sprintf(msg, "Failed to allocate %lu bytes for struct TestStruct: ", sizeof(struct TestStruct));
         alloc_perror(msg);
         free(msg);
@@ -36,9 +36,9 @@ int main(int argc, char *argv[]) {
     printf("Test struct:   [Value: %d] [Str: %s]\n", test_struct->value, test_struct->str);
     cfh_free(alloc, test_struct);
 
-    struct TestStruct* test_struct2 = cfh_malloc(alloc, sizeof(struct TestStruct));
+    struct TestStruct* test_struct2 = cfh_malloc(alloc, sizeof(*test_struct2));
     if (test_struct2 == NULL) {
-        char *msg = calloc(100, sizeof(char));
+        char *msg = calloc(100, sizeof(*msg));
         sprintf(msg, "Failed to allocate %lu bytes for struct TestStruct: ", sizeof(struct TestStruct));
         alloc_perror(msg);
         free(msg);

@@ -6,6 +6,15 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+# ---- DEFINES ---- #
+
+#add_definitions(
+#        -DSTATIC_CFH
+#        -DSTATIC_CFH_HEAP_SIZE=200000
+#        -DSTATIC_CFH_CONSTRUCTOR_PRIORITY=0
+#        -DSTATIC_CFH_DESTRUCTOR_PRIORITY=0
+#)
+
 # ---- SOURCES ---- #
 
 # Include source content
