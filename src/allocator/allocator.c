@@ -10,10 +10,10 @@ int cfh_new(Allocator* alloc) {
         set_alloc_errno(NULL_ALLOCATOR_INSTANCE);
         return -1;
     }
-    (*alloc).heap_size = 0;
-    (*alloc).freep = NULL;
-    (*alloc).current_brk = NULL;
-    (*alloc).heap = NULL;
+    alloc->heap_size = 0;
+    alloc->freep = NULL;
+    alloc->current_brk = NULL;
+    alloc->heap = NULL;
     return 0;
 }
 
@@ -27,9 +27,9 @@ int cfh_init(Allocator* alloc,
         set_alloc_errno(HEAP_ALREADY_MAPPED);
         return -1;
     }
-    (*alloc).method = method;
-    (*alloc).heap_size = heap_size;
-    (*alloc).current_brk = (*alloc).heap = mmap(
+    alloc->method = method;
+    alloc->heap_size = heap_size;
+    alloc->current_brk = alloc->heap = mmap(
         NULL,
         heap_size,
         PROT_READ | PROT_WRITE,
@@ -60,7 +60,7 @@ int cfh_brk(Allocator* alloc, void* addr) {
     if (addr > (alloc->heap + (uintptr_t) alloc->heap_size)) {
         return -1;
     }
-    (*alloc).current_brk = addr;
+    alloc->current_brk = addr;
     return 0;
 }
 
@@ -88,7 +88,7 @@ void cfh_free(Allocator* alloc, void* ap) {
     Header* bp, *p;
 
     bp = (Header*) ap - 1;
-    for (p = (*alloc).freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr) {
+    for (p = alloc->freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr) {
         if (p >= p->s.ptr && (bp > p || bp < p->s.ptr)) {
             break;
         }
@@ -105,7 +105,7 @@ void cfh_free(Allocator* alloc, void* ap) {
     } else {
         p->s.ptr = bp;
     }
-    (*alloc).freep = p;
+    alloc->freep = p;
 }
 
 Header* more_core(Allocator* alloc, unsigned int nu) {
@@ -130,8 +130,8 @@ void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
     unsigned nunits = (nbytes + sizeof(Header) + 1) / sizeof(Header) + 1;
 
     if ((prevp = alloc->freep) == NULL) {
-        (*alloc).base.s.ptr = (*alloc).freep = prevp = &alloc->base;
-        (*alloc).base.s.size = 0;
+        alloc->base.s.ptr = alloc->freep = prevp = &alloc->base;
+        alloc->base.s.size = 0;
     }
 
     for (p = prevp->s.ptr;; prevp = p, p = p->s.ptr) {
@@ -143,7 +143,7 @@ void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
                 p += p->s.size;
                 p->s.size = nunits;
             }
-            (*alloc).freep = prevp;
+            alloc->freep = prevp;
             return (void*) (p+1);
         }
         if (p == alloc->freep && ((p = more_core(alloc, nunits)) == NULL)) {
