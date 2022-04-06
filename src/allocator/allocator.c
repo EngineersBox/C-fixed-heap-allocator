@@ -29,7 +29,7 @@ int cfh_new(Allocator* alloc) {
         return -1;
     }
     int lock_init_result;
-    if ((lock_init_result = __cfh_lock_init(&alloc->mutex, PTHREAD_MUTEX_ERRORCHECK)) != 0) {
+    if ((lock_init_result = __cfh_lock_init(&alloc->mutex, PTHREAD_MUTEX_RECURSIVE)) != 0) {
         set_alloc_errno_msg(MUTEX_LOCK_INIT, strerror(lock_init_result));
         return -1;
     }
@@ -119,7 +119,10 @@ void* cfh_sbrk(Allocator* alloc, intptr_t increment) {
     return oldbrk;
 }
 
-void cfh_free(Allocator* alloc, void* ap) {
+int cfh_free(Allocator* alloc, void* ap) {
+    if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
+        return -1;
+    }
     Header* bp, *p;
 
     bp = (Header*) ap - 1;
@@ -141,6 +144,7 @@ void cfh_free(Allocator* alloc, void* ap) {
         p->s.ptr = bp;
     }
     alloc->freep = p;
+    return __cfh_lock_unlock_handled(&alloc->mutex);
 }
 
 Header* more_core(Allocator* alloc, unsigned int nu) {
@@ -156,7 +160,9 @@ Header* more_core(Allocator* alloc, unsigned int nu) {
     }
     up = (Header*) cp;
     up->s.size = nu;
-    cfh_free(alloc, (void*)(up + 1));
+    if (cfh_free(alloc, (void*)(up + 1)) != 0) {
+        return NULL;
+    }
     return alloc->freep;
 }
 
