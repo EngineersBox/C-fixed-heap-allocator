@@ -199,7 +199,7 @@ void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
 }
 
 void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes) {
-    return NULL;
+    return cfh_malloc(alloc, count * nbytes);
 }
 
 void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes) {

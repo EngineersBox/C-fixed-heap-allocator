@@ -7,6 +7,13 @@ struct TestStruct {
     char str[4];
 };
 
+#define print_error(subs, bytes) \
+    char *msg = calloc(100, sizeof(*msg)); \
+    sprintf(msg, subs, bytes); \
+    alloc_perror(msg); \
+    free(msg); \
+    return 1
+
 int main(int argc, char *argv[]) {
     Allocator* alloc = malloc(sizeof(*alloc));
     if (cfh_new(alloc) == -1) {
@@ -20,11 +27,7 @@ int main(int argc, char *argv[]) {
 
     struct TestStruct* test_struct = cfh_malloc(alloc, sizeof(*test_struct));
     if (test_struct == NULL) {
-        char *msg = calloc(100, sizeof(*msg));
-        sprintf(msg, "Failed to allocate %lu bytes for struct TestStruct: ", sizeof(struct TestStruct));
-        alloc_perror(msg);
-        free(msg);
-        return 1;
+        print_error("Failed to allocate %lu bytes: ", sizeof(*test_struct));
     }
 
     test_struct->value = 42;
@@ -34,28 +37,26 @@ int main(int argc, char *argv[]) {
     test_struct->str[3] = '!';
 
     printf("Test struct:   [Value: %d] [Str: %s]\n", test_struct->value, test_struct->str);
-    cfh_free(alloc, test_struct);
-
-    struct TestStruct* test_struct2 = cfh_malloc(alloc, sizeof(*test_struct2));
-    if (test_struct2 == NULL) {
-        char *msg = calloc(100, sizeof(*msg));
-        sprintf(msg, "Failed to allocate %lu bytes for struct TestStruct: ", sizeof(struct TestStruct));
-        alloc_perror(msg);
-        free(msg);
-        return 1;
+    if (cfh_free(alloc, test_struct) != 0) {
+        print_error("Failed to deallocate %p", test_struct);
     }
 
-    test_struct2->value = 84;
-    test_struct2->str[0] = 'd';
-    test_struct2->str[1] = 'o';
-    test_struct2->str[2] = 'n';
-    test_struct2->str[3] = 'e';
+    char* string = cfh_calloc(alloc, 5, sizeof(*string));
+    if (string == NULL) {
+        print_error("Failed to allocate %lu bytes: ", 4 * sizeof(*string));
+    }
 
-    printf("Test Struct 2: [Value: %d] [Str: %s]\n", test_struct2->value, test_struct2->str);
+    string[0] = 'T';
+    string[1] = 'e';
+    string[2] = 's';
+    string[3] = 't';
+    string[4] = '\0';
 
-    cfh_free(alloc, test_struct2);
+    printf("String values: %s\n", string);
 
-    printf("Deallocated memory from Test Struct: %d", test_struct->value);
+    if (cfh_free(alloc, string) != 0) {
+        print_error("Failed to deallocate %p", string);
+    }
 
     if (cfh_destruct(alloc) == -1) {
         alloc_perror("");
