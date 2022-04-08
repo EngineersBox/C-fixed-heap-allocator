@@ -200,7 +200,7 @@ void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
 
 void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes) {
     void* ptr = cfh_malloc(alloc, count * nbytes);
-    return memset(ptr, 0, count * nbytes);
+    return ptr == NULL ? NULL : memset(ptr, 0, count * nbytes);
 }
 
 void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes) {
