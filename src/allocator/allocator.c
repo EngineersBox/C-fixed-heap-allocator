@@ -46,7 +46,7 @@ int cfh_init(Allocator* alloc,
     if (alloc == NULL) {
         set_alloc_errno(NULL_ALLOCATOR_INSTANCE);
         return -1;
-    } else if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
+    } else if (__cfh_lock_lock_handled(&alloc->mutex) == -1) {
         return -1;
     } else if (alloc->heap != NULL) {
         set_alloc_errno(HEAP_ALREADY_MAPPED);
@@ -76,7 +76,7 @@ int cfh_destruct(Allocator* alloc) {
         set_alloc_errno(BAD_DEALLOC);
         return -1;
     }
-    if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
+    if (__cfh_lock_lock_handled(&alloc->mutex) == -1) {
         return -1;
     }
     if (alloc->heap != NULL && munmap(alloc->heap, alloc->heap_size)) {
@@ -84,7 +84,7 @@ int cfh_destruct(Allocator* alloc) {
         __cfh_lock_unlock_handled(&alloc->mutex);
         return -1;
     }
-    if (__cfh_lock_unlock_handled(&alloc->mutex) != 0) {
+    if (__cfh_lock_unlock_handled(&alloc->mutex) == -1) {
         return -1;
     }
     free(alloc);
@@ -120,7 +120,7 @@ void* cfh_sbrk(Allocator* alloc, intptr_t increment) {
 }
 
 int cfh_free(Allocator* alloc, void* ap) {
-    if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
+    if (__cfh_lock_lock_handled(&alloc->mutex) == -1) {
         return -1;
     }
     Header* bp, *p;
@@ -167,7 +167,7 @@ Header* more_core(Allocator* alloc, unsigned int nu) {
 }
 
 void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
-    if (__cfh_lock_lock_handled(&alloc->mutex) != 0) {
+    if (__cfh_lock_lock_handled(&alloc->mutex) == -1) {
         return NULL;
     }
     Header *p, *prevp;
@@ -199,7 +199,8 @@ void* cfh_malloc(Allocator* alloc, unsigned nbytes) {
 }
 
 void* cfh_calloc(Allocator* alloc, unsigned count, unsigned nbytes) {
-    return cfh_malloc(alloc, count * nbytes);
+    void* ptr = cfh_malloc(alloc, count * nbytes);
+    return memset(ptr, 0, count * nbytes);
 }
 
 void* cfh_realloc(Allocator* alloc, void* ap, unsigned nbytes) {

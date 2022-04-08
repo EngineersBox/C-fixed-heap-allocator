@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 
     char* string = cfh_calloc(alloc, 5, sizeof(*string));
     if (string == NULL) {
-        print_error("Failed to allocate %lu bytes: ", 4 * sizeof(*string));
+        print_error("Failed to allocate %lu bytes: ", 5 * sizeof(*string));
     }
 
     string[0] = 'T';
