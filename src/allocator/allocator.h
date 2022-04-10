@@ -3,6 +3,10 @@
 #ifndef _H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
 #define _H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 #include "../thread/lock.h"
@@ -20,8 +24,6 @@ typedef union header {
 typedef enum allocation_method {
     BEST_FIT,
     FIRST_FIT,
-    WORST_FIT,
-    BUDDYS_SYSTEM,
     NEXT_FIT,
 } AllocationMethod;
 
@@ -62,5 +64,9 @@ __attribute__((malloc
 
 void* cfh_sbrk(Allocator* alloc, intptr_t increment) __attribute__((nonnull(1)));
 int cfh_brk(Allocator* alloc, void* addr) __attribute__((nonnull(1)));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_

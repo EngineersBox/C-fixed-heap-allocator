@@ -3,6 +3,10 @@
 #ifndef _H_C_FIXED_HEAP_ALLOCATOR_ERRNO_
 #define _H_C_FIXED_HEAP_ALLOCATOR_ERRNO_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <string.h>
 
@@ -54,5 +58,9 @@ extern inline void get_alloc_errmsg(AllocatorErrno err);
         __alloc__errno_location \
     ); \
 })
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _H_C_FIXED_HEAP_ALLOCATOR_ERRNO_

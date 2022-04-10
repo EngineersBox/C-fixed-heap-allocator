@@ -3,6 +3,10 @@
 #ifndef _H_C_FIXED_HEAP_ALLOCATOR_STATIC_ALLOCATOR_
 #define _H_C_FIXED_HEAP_ALLOCATOR_STATIC_ALLOCATOR_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include "allocator.h"
 #include "../error/allocator_errno.h"
@@ -44,6 +48,10 @@ __attribute__((__destructor__
     return 0;
 }
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // _H_C_FIXED_HEAP_ALLOCATOR_STATIC_ALLOCATOR_
