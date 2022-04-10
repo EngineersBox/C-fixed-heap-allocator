@@ -45,7 +45,7 @@ int cfh_new(Allocator* alloc);
 int cfh_init(Allocator* alloc, AllocationMethod method, size_t heap_size)  __attribute__((nonnull));
 int cfh_destruct(Allocator* alloc)  __attribute__((nonnull));
 
-int cfh_free(Allocator* alloc, void* ap);
+int cfh_free(Allocator* alloc, void* ap) __attribute__((nonnull));
 __attribute__((malloc
 #if __GNUC__ >= 10
     , malloc (cfh_free, 2)
