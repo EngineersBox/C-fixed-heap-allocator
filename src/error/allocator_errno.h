@@ -60,7 +60,7 @@ extern inline void get_alloc_errmsg(AllocatorErrno err);
 })
 
 #ifdef __cplusplus
-}
+};
 #endif
 
 #endif // _H_C_FIXED_HEAP_ALLOCATOR_ERRNO_

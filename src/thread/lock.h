@@ -29,7 +29,7 @@ typedef pthread_mutex_t __cfh_lock_t;
 #define __cfh_lock_unlock(lock) pthread_mutex_unlock(lock)
 
 #ifdef __cplusplus
-}
+};
 #endif
 
 #endif // _H_C_FIXED_HEAP_ALLOCATOR_THREAD_LOCK_

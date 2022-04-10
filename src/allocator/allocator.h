@@ -66,7 +66,7 @@ void* cfh_sbrk(Allocator* alloc, intptr_t increment) __attribute__((nonnull(1)))
 int cfh_brk(Allocator* alloc, void* addr) __attribute__((nonnull(1)));
 
 #ifdef __cplusplus
-}
+};
 #endif
 
 #endif // _H_C_FIXED_HEAP_ALLOCATOR_ALLOCATOR_

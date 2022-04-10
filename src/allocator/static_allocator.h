@@ -51,7 +51,7 @@ __attribute__((__destructor__
 #endif
 
 #ifdef __cplusplus
-}
+};
 #endif
 
 #endif // _H_C_FIXED_HEAP_ALLOCATOR_STATIC_ALLOCATOR_
