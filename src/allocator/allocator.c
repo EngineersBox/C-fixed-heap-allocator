@@ -79,7 +79,7 @@ int cfh_destruct(Allocator* alloc) {
     if (__cfh_lock_lock_handled(&alloc->mutex) == -1) {
         return -1;
     }
-    if (alloc->heap != NULL && munmap(alloc->heap, alloc->heap_size)) {
+    if (alloc->heap != NULL && munmap(alloc->heap, alloc->heap_size) != 0) {
         set_alloc_errno(HEAP_UNMAP_FAILED);
         __cfh_lock_unlock_handled(&alloc->mutex);
         return -1;
