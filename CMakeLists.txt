@@ -3,7 +3,7 @@ project(C_fixed_heap_allocator C)
 
 #set(CC gcc-9.3)
 set(CMAKE_C_STANDARD 17)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -pthread")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # ---- DEFINES ---- #
